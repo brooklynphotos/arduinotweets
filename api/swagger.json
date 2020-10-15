@@ -1,0 +1,257 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Arduino Tweets",
+    "title": "Arduino Tweets",
+    "version": "1.0"
+  },
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/users": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "List users",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Users"
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string",
+                "description": "URI that may access the resource"
+              }
+            }
+          }
+        },
+        
+        "x-amazon-apigateway-integration" : {
+          "type" : "aws",
+          "uri" : "arn:aws:lambda:eu-west-1:575798484766:function:ArduinoTweetViewer",
+          "httpMethod" : "GET"
+        }
+              
+      }
+    },
+    "/users/{user_id}": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Info for a specific user",
+        "operationId": "GetUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "The id of the user to retrieve",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/User"
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "type": "string",
+                "description": "URI that may access the resource"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "requestParameters": {
+            "integration.request.path.userId": "method.request.path.userId"
+          },
+          "uri": "http://arduinotweets.execute-api.eu-west-1.amazonaws.com/arduinotweets/users/{userId}",
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "GET",
+          "type": "http"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Users": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/User"
+      }
+    },
+    "Empty": {
+      "type": "object"
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-amazon-apigateway-documentation": {
+    "version": "v2.1",
+    "createdDate": "2016-11-17T07:03:59Z",
+    "documentationParts": [
+      {
+        "location": {
+          "type": "API"
+        },
+        "properties": {
+          "info": {
+            "description": "Arduino Tweets using Amazon API Gateway."
+          }
+        }
+      },
+      {
+        "location": {
+          "type": "METHOD",
+          "method": "GET"
+        },
+        "properties": {
+          "tags": [
+            "users"
+          ],
+          "description": "Arduino Tweets HTML web page containing API usage information"
+        }
+      },
+      {
+        "location": {
+          "type": "METHOD",
+          "path": "/users/{userId}",
+          "method": "GET"
+        },
+        "properties": {
+          "tags": [
+            "users"
+          ],
+          "summary": "Info for a specific user"
+        }
+      },
+      {
+        "location": {
+          "type": "METHOD",
+          "path": "/users",
+          "method": "GET"
+        },
+        "properties": {
+          "tags": [
+            "users"
+          ],
+          "summary": "List all users"
+        }
+      },
+      {
+        "location": {
+          "type": "PATH_PARAMETER",
+          "path": "/users/{userId}",
+          "method": "*",
+          "name": "userId"
+        },
+        "properties": {
+          "description": "The id of the user to retrieve"
+        }
+      },
+      {
+        "location": {
+          "type": "QUERY_PARAMETER",
+          "path": "/users",
+          "method": "GET",
+          "name": "page"
+        },
+        "properties": {
+          "description": "Page number of results to return."
+        }
+      },
+      {
+        "location": {
+          "type": "QUERY_PARAMETER",
+          "path": "/users",
+          "method": "GET",
+          "name": "type"
+        },
+        "properties": {
+          "description": "The type of user to retrieve"
+        }
+      },
+      {
+        "location": {
+          "type": "RESPONSE",
+          "method": "*",
+          "statusCode": "200"
+        },
+        "properties": {
+          "description": "Successful operation"
+        }
+      },
+      {
+        "location": {
+          "type": "RESPONSE_HEADER",
+          "method": "OPTIONS",
+          "statusCode": "200",
+          "name": "Access-Control-Allow-Headers"
+        },
+        "properties": {
+          "description": "Used in response to a preflight request to indicate which HTTP headers can be used when making the request."
+        }
+      },
+      {
+        "location": {
+          "type": "RESPONSE_HEADER",
+          "method": "OPTIONS",
+          "statusCode": "200",
+          "name": "Access-Control-Allow-Methods"
+        },
+        "properties": {
+          "description": "Method or methods allowed when accessing the resource"
+        }
+      },
+      {
+        "location": {
+          "type": "RESPONSE_HEADER",
+          "method": "*",
+          "statusCode": "200",
+          "name": "Access-Control-Allow-Origin"
+        },
+        "properties": {
+          "description": "URI that may access the resource"
+        }
+      },
+      {
+        "location": {
+          "type": "RESPONSE_HEADER",
+          "method": "GET",
+          "statusCode": "200",
+          "name": "Content-Type"
+        },
+        "properties": {
+          "description": "Media type of request"
+        }
+      }
+    ]
+  }
+}
