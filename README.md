@@ -10,10 +10,16 @@ API -> Tweet API <- DynamoDB
 See: https://docs.aws.amazon.com/lambda/latest/dg/python-package.html
 ### How to Update
 `zip twitter.zip lambda_function.py`
-`aws lambda update-function-code --function-name twitter_mine --zip-file fileb://twitter.zip --profile guoneng`
+`aws lambda update-function-code --function-name twitter_mine --zip-file fileb://twitter.zip --profile`
 ### Change Alias of Prod
-`aws lambda update-alias --function-name twitter_mine --name prod --function-version 2 --profile guoneng`
-`aws lambda update-alias --function-name ArduinoTweetParser --name prod --function-version 2 --profile guoneng`
+`aws lambda update-alias --function-name twitter_mine --name prod --function-version 2 --profile`
+`aws lambda update-alias --function-name ArduinoTweetParser --name prod --function-version 2 --profile`
+
+## API Gateway
+### Importing
+`aws apigateway import-rest-api --body 'file://api/swagger.json' --fail-on-warnings --profile`
+### Removing
+`aws apigateway delete-rest-api --rest-api-id gu82d61gji --profile`
 
 ## AWS Stacks Used
 ### Lambda
