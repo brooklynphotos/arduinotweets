@@ -14,12 +14,20 @@ def retrieve_tweets(event: dict) -> list:
 
 def upsert_db(tweets: list) -> list:
   dynamodb = boto3.resource('dynamodb')
-  table = dynamodb.Table('arduino_tweets')
+  tweets_table = dynamodb.Table('arduino_tweets')
+  users_table = dynamodb.Table('arduino_twitter_users')
   affected = []
-  with table.batch_writer(overwrite_by_pkeys=['id', 'user_id']) as batch:
+  user_ids = set()
+  with tweets_table.batch_writer(overwrite_by_pkeys=['id', 'user_id']) as batch:
     for t in tweets:
       batch.put_item(
         Item=t
       )
+      user_ids.add({'id': t['user_id']})
       affected.append({k: v for k,v in t.items() if k in ['id', 'user_id']})
+  with users_table.batch_writer(overwrite_by_pkeys=['user_id']) as batch:
+    for u in user_ids:
+      batch.put_item(
+        Item=u
+      )
   return affected
