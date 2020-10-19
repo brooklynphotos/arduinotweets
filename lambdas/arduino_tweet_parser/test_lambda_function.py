@@ -52,12 +52,13 @@ sample_event = {'Records': [{
 class TestTwitterUpdates(unittest.TestCase):
 
   def test_retrieve_tweets(self):
-    tweets = retrieve_tweets(sample_event)
+    retrieval_time, tweets = retrieve_tweets(sample_event)
     self.assertEqual(2, len(tweets))
-    self.assertEqual(sorted(['id', 'user_id', 'created_at', 'text', 'timestamp']), sorted(tweets[1].keys()))
+    self.assertEqual(sorted(['id', 'user_id', 'created_at', 'text', 'job_time']), sorted(tweets[1].keys()))
 
   def test_upsert_db(self):
-    affected = upsert_db(retrieve_tweets(sample_event))
+    retrieval_time, tweets = retrieve_tweets(sample_event)
+    affected = upsert_db(tweets, retrieval_time)
     self.assertEqual(2, len(affected))
 
 if __name__=='__main__':

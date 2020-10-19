@@ -4,15 +4,18 @@ import boto3
 import json
 from datetime import datetime
 
+job_time_attr = 'job_time'
+
 def lambda_handler(event, context):
-  tweets = retrieve_tweets(event)
-  return upsert_db(tweets)
+  retrieval_time, tweets = retrieve_tweets(event)
+  return upsert_db(tweets, retrieval_time)
 
 def retrieve_tweets(event: dict) -> list:
     msg_body = event['Records'][0]['body']
-    return [{'id': t['id_str'], 'text': t['text'], 'created_at': t['created_at'], 'user_id': t['user_id'], 'timestamp': datetime.utcnow().isoformat()} for t in json.loads(msg_body)['responsePayload']]
+    retrieval_time = datetime.utcnow().isoformat()
+    return retrieval_time, [{'id': t['id_str'], 'text': t['text'], 'created_at': t['created_at'], 'user_id': t['user_id'], job_time_attr: retrieval_time} for t in json.loads(msg_body)['responsePayload']]
 
-def upsert_db(tweets: list) -> list:
+def upsert_db(tweets: list, retrieval_time: str) -> list:
   dynamodb = boto3.resource('dynamodb')
   tweets_table = dynamodb.Table('arduino_tweets')
   users_table = dynamodb.Table('arduino_twitter_users')
@@ -23,11 +26,14 @@ def upsert_db(tweets: list) -> list:
       batch.put_item(
         Item=t
       )
-      user_ids.add({'id': t['user_id']})
+      user_ids.add(t['user_id'])
       affected.append({k: v for k,v in t.items() if k in ['id', 'user_id']})
-  with users_table.batch_writer(overwrite_by_pkeys=['user_id']) as batch:
+  with users_table.batch_writer(overwrite_by_pkeys=['id']) as batch:
     for u in user_ids:
       batch.put_item(
-        Item=u
+        Item={
+          'id':u,
+          job_time_attr: retrieval_time
+        }
       )
   return affected
