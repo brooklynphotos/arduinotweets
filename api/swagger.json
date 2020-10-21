@@ -32,10 +32,8 @@
             }
           }
         },
-        
-        "x-amazon-apigateway-integration" : {
-          "type" : "aws",
-          "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:575798484766:function:ArduinoTweetViewer/invocations",
+        "x-amazon-apigateway-integration": {
+          "uri": "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:575798484766:function:ArduinoTweetViewer/invocations",
           "responses": {
             "default": {
               "statusCode": "200",
@@ -46,21 +44,25 @@
           },
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
-          "contentHandling": "CONVERT_TO_TEXT"
+          "contentHandling": "CONVERT_TO_TEXT",
+          "type": "aws"
         }
               
       }
     },
     "/users/{user_id}": {
       "get": {
+        "operationId": "GetUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "tags": [
           "users"
         ],
         "summary": "Info for a specific user",
-        "operationId": "GetUser",
-        "produces": [
-          "application/json"
-        ],
         "parameters": [
           {
             "name": "userId",
@@ -78,33 +80,90 @@
             },
             "headers": {
               "Access-Control-Allow-Origin": {
-                "type": "string",
-                "description": "URI that may access the resource"
+                "description": "URI that may access the resource",
+                "type": "string"
               }
             }
           }
         },
         "x-amazon-apigateway-integration": {
+          "uri": "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:575798484766:function:ArduinoTweetViewer/invocations",
           "responses": {
             "default": {
-              "statusCode": "200",
-              "responseParameters": {
-                "method.response.header.Access-Control-Allow-Origin": "'*'"
-              }
+              "statusCode": "200"
             }
           },
-          "requestParameters": {
-            "integration.request.path.userId": "method.request.path.userId"
+          "requestTemplates": {
+            "application/json": "{\n   \"user_id\": \"$input.params(\"user_id\")\"\n}"
           },
-          "uri": "http://arduinotweets.execute-api.eu-west-1.amazonaws.com/arduinotweets/users/{userId}",
-          "passthroughBehavior": "when_no_match",
-          "httpMethod": "GET",
-          "type": "http"
+          "passthroughBehavior": "when_no_templates",
+          "httpMethod": "POST",
+          "contentHandling": "CONVERT_TO_TEXT",
+          "type": "aws"
+        }
+      }
+    },
+    "/users/{user_id}/tweets": {
+      "get": {
+        "operationId": "GetUserTweets",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "users"
+        ],
+        "summary": "List of tweets for this user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "The id of the user to retrieve",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/TweetIds"
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "URI that may access the resource",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "uri": "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:575798484766:function:ArduinoUserTweets/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "requestTemplates": {
+            "application/json": "{\n   \"user_id\": \"$input.params(\"user_id\")\"\n}"
+          },
+          "passthroughBehavior": "when_no_templates",
+          "httpMethod": "POST",
+          "contentHandling": "CONVERT_TO_TEXT",
+          "type": "aws"
         }
       }
     }
   },
   "definitions": {
+    "TweetIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "Users": {
       "type": "array",
       "items": {
