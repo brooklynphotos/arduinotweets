@@ -7,7 +7,7 @@ class TestUserTweets(unittest.TestCase):
 
   def test_get_tweets(self):
     user_id = "284068570"
-    tweets = get_tweets(user_id)
+    tweets = get_tweets(user_id, {'limit': 4})
     self.assertEqual(4, len(tweets))
     self.assertEqual('1316173068247732224', tweets[0])
 
