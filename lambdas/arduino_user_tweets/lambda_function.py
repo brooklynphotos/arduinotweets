@@ -1,3 +1,6 @@
+'''ArduinoUserTweets
+Manages the tweets this owner owns
+'''
 import json
 import boto3
 
@@ -24,7 +27,8 @@ def get_tweets(user_id: str, pagination: dict) -> dict:
   resp = client.query(**params)
   return {
     "data": [tweet['id']['S'] for tweet in resp['Items']],
-    "LastEvaluatedKey": resp.get("LastEvaluatedKey")
+    "LastEvaluatedKey": resp.get("LastEvaluatedKey"),
+    "pagination": pagination
   }
 
 def build_rest_response(resp_items: list) -> dict:

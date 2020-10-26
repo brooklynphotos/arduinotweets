@@ -1,3 +1,4 @@
+'''Gets info about the users whose tweets are retrieves'''
 import json
 import boto3
 
